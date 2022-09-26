@@ -1,6 +1,26 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
+import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
+import 'package:instagram_clone/responsive/web_screen_layout.dart';
+import 'package:instagram_clone/screens/login_screen.dart';
+import 'package:instagram_clone/screens/signup_screen.dart';
+import 'package:instagram_clone/utils/colors.dart';
+import 'package:flutter/foundation.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+            apiKey: 'AIzaSyB_Qi2nAhBWSnfOgqTURlF3aU_mE69hslk',
+            appId: '1:370826015833:web:0be8c40fd6669dcf402d48',
+            messagingSenderId: '370826015833',
+            projectId: 'instagram-clone-riset'));
+  } else {
+    await Firebase.initializeApp();
+  }
+
   runApp(const MyApp());
 }
 
@@ -11,20 +31,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+      debugShowCheckedModeBanner: false,
+      title: 'Instagram Clone Riset',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: mobileBackgroundColor,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      // home: const ResponsiveLayout(
+      //     webScreenLayout: WebScreenLayout(),
+      //     mobileScreenLayout: MobileScreenLayout()),
+      home: SignupScreen(),
     );
   }
 }
