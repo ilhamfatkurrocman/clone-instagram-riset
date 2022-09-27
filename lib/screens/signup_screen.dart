@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -15,6 +19,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  Uint8List? _image;
 
   @override
   void dispose() {
@@ -23,6 +28,13 @@ class _SignupScreenState extends State<SignupScreen> {
     _passwordController.dispose();
     _bioController.dispose();
     _usernameController.dispose();
+  }
+
+  void selectImage() async {
+    Uint8List img = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = img;
+    });
   }
 
   @override
@@ -44,25 +56,43 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 64,
               ),
               const SizedBox(
-                height: 64,
+                height: 20,
               ),
 
               // cicular widget to accept and show our selected file
               Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 64,
-                    backgroundImage: NetworkImage(
-                      'https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=882&q=80',
+                  _image != null
+                      ? CircleAvatar(
+                          radius: 50,
+                          backgroundImage: MemoryImage(_image!),
+                        )
+                      : const CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(
+                              'https://www.kindpng.com/picc/m/21-214439_free-high-quality-person-icon-default-profile-picture.png'),
+                        ),
+                  Positioned(
+                    bottom: -5,
+                    left: 64,
+                    child: IconButton(
+                      onPressed: selectImage,
+                      icon: const Icon(
+                        Icons.add_a_photo,
+                      ),
                     ),
                   ),
                 ],
               ),
 
+              const SizedBox(
+                height: 25,
+              ),
+
               // text field input for username
               TextFieldInput(
                 textEditingController: _usernameController,
-                hintText: 'Enter your usernmae',
+                hintText: 'Enter your username',
                 textInputType: TextInputType.text,
               ),
 
@@ -102,6 +132,16 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               // Button login
               InkWell(
+                onTap: () async {
+                  String response = await AuthMethods().signUpUser(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    username: _usernameController.text,
+                    bio: _bioController.text,
+                    file: _image!,
+                  );
+                  print(response);
+                },
                 child: Container(
                   child: const Text('Log in'),
                   width: double.infinity,
@@ -141,7 +181,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       padding: const EdgeInsets.symmetric(
-                        vertical: 30,
+                        vertical: 20,
                       ),
                     ),
                   ),
